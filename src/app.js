@@ -8,9 +8,22 @@ const authRoutes = require("./routes/auth");
 
 const app = express();
 
+// Orígenes permitidos
+const allowedOrigins = [
+  "http://localhost:3000",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: function (origin, callback) {
+      // permite peticiones sin origin (curl, Postman) y los orígenes de la lista
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("No permitido por CORS"));
+      }
+    },
   })
 );
 app.use(express.json());
